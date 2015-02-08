@@ -72,13 +72,12 @@ class PRDD:
         return self._rdd
 
     def from_rdd_of_dataframes(self, rdd):
-        """A Sparkling Pandas specific function to turn a DDF into
-        something that Spark SQL can query. To use the result you will
-        need to call sqlCtx.inferSchema(rdd) and then register the result
-        as a table. Once Spark 1.1 is released this function may be deprecated
-        and replacted with to_spark_sql_schema_rdd."""
-        raise NotImplementedError("Method deprecated, please use "
-                                  "to_spark_sql_schema_rdd instead!")
+        """A Sparkling Pandas specific function to convert an RDD of
+        Pandas DataFrames into the SchemaRDD we use underneath"""
+        def fram_to_spark_sql(frame):
+             """Convert a Panda's DataFrame into Spark SQL Rows"""
+             return map((lambda x: x[1].__dict__), frame.iterrows())
+         self._rdd = rdd.flatMap(frame_to_spark_sql)
 
     def applymap(self, f, **kwargs):
         """Return a new PRDD by applying a function to each element of each
